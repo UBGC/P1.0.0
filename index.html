@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UBG — Pobierz grę</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --accent:#4b7bec; --muted:#6b7280;
+      --maxw:900px;
+      font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body{background:linear-gradient(180deg,#f6f7fb 0%, #eef2ff 100%); margin:0; padding:40px 16px; color:#1f2937; display:flex; justify-content:center;}
+    .wrap{max-width:var(--maxw); width:100%;}
+    header{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
+    .logo{width:64px; height:64px; border-radius:12px; background:var(--accent); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:22px;}
+    h1{margin:0; font-size:22px;}
+    .card{background:var(--card); border-radius:14px; padding:20px; box-shadow:0 8px 30px rgba(21, 32, 64, 0.06);}
+    .download{display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+    .btn{
+      background:var(--accent); color:white; padding:12px 18px; border-radius:10px; text-decoration:none; font-weight:600;
+      box-shadow: 0 6px 14px rgba(75,124,236,0.18); display:inline-block;
+    }
+    .btn.secondary{background:#f3f4f6; color:#111827; box-shadow:none; border:1px solid #e6e9ef;}
+    .meta{color:var(--muted); font-size:14px;}
+    pre.check{background:#0f1724;color:#e6eef8;padding:12px;border-radius:8px; overflow:auto; font-size:13px;}
+    .row{display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+    .notes{margin-top:14px; color:#111827; line-height:1.5;}
+    footer{margin-top:18px; color:var(--muted); font-size:13px; text-align:center;}
+    @media(max-width:600px){ header{gap:10px} .logo{width:52px;height:52px;font-size:18px} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">UBG</div>
+      <div>
+        <h1>Ultrabattleground — Pobierz (Windows)</h1>
+        <div class="meta">Wersja: <strong id="version">1.0.0</strong> · Rozmiar: <span id="filesize">—</span></div>
+      </div>
+    </header>
+
+    <div class="card">
+      <p class="meta">Pobierz najnowszą wersję gry. Zalecamy użycie archiwum <strong>.zip</strong> (większość przeglądarek blokuje bezpośrednie .exe).</p>
+
+      <div class="download">
+        <!-- === ZMIENNA: ustaw tutaj href na utworzony ZIP/EXE === -->
+        <a id="dl-main" class="btn" href="releases/UBG-1.0.0-win.zip" download>📥 Pobierz ZIP (Windows)</a>
+
+        <!-- alternatywny link do konkretnej platformy -->
+        <a id="dl-exe" class="btn secondary" href="releases/UBG-1.0.0-win.exe">exe (bezpośrednio)</a>
+
+        <!-- GitHub Releases link if you host there -->
+        <a class="btn secondary" href="https://github.com/TwojeRepo/UBG/releases" target="_blank">Strona wydań (GitHub)</a>
+      </div>
+
+      <div class="row">
+        <div style="flex:1">
+          <strong>SHA256 (sprawdź po pobraniu)</strong>
+          <pre id="sha" class="check">FAC1463051BB09976A74D73A9D9D26CD84AA80A9BDADEFF4449F4F5DAE4F8FBE</pre>
+          <button id="copysha" class="btn secondary" style="padding:8px 10px">Kopiuj checksum</button>
+        </div>
+
+        <div style="min-width:220px">
+          <strong>Instrukcja instalacji</strong>
+          <ol style="padding-left:18px; margin:8px 0 0 0;">
+            <li>Rozpakuj pobrany plik .zip</li>
+            <li>Skopiuj foldery `flags/`, `leaders/` i plik `main.exe` obok siebie</li>
+            <li>Uruchom <code>main.exe</code></li>
+          </ol>
+        </div>
+      </div>
+
+      <section class="notes">
+        <h3>Co dołączone</h3>
+        <ul>
+          <li>main.exe (wersja skompilowana)</li>
+          <li>foldery z zasobami: <code>flags/</code>, <code>leaders/</code></li>
+          <li>pliki językowe i mapy</li>
+        </ul>
+
+        <h3>Wskazówki dla hostingu</h3>
+        <ul>
+          <li>Zalecane: wrzuć ZIP zamiast EXE (mniejsze blokowania przez przeglądarki i hostingi).</li>
+          <li>Jeśli hostujesz na własnym serwerze Apache/Nginx — ustaw nagłówek <code>Content-Disposition: attachment</code>, żeby wymusić pobieranie.</li>
+          <li>Dla bezpieczeństwa: poinformuj użytkowników, aby weryfikowali SHA256 pliku.</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <footer>
+      Potrzebujesz pomocy z utworzeniem release (GitHub) lub plikiem .spec do PyInstaller? Napisz — pomogę krok po kroku.
+    </footer>
+  </div>
+
+  <script>
+    // (1) Uaktualnij wielkość pliku (opcjonalnie: zostaw dash jeśli nie znasz)
+    (function(){
+      // Jeśli chcesz dynamicznie ustawić rozmiar z serwera, trzeba fetchować HEAD i odczytać Content-Length.
+      // Tutaj pozostawiam domyślnie nieznane.
+      document.getElementById('filesize').textContent = 'około 30 MB (podaj rzeczywisty rozmiar)';
+    })();
+
+    // (2) kopiowanie checksum
+    document.getElementById('copysha').addEventListener('click', async function(){
+      const text = document.getElementById('sha').textContent.trim();
+      try {
+        await navigator.clipboard.writeText(text);
+        this.textContent = 'Skopiowano!';
+        setTimeout(()=> this.textContent = 'Kopiuj checksum', 1600);
+      } catch(e){
+        alert('Nie udało się skopiować — skopiuj ręcznie: ' + text);
+      }
+    });
+
+    // (3) zabezpieczenie: jeśli hostujesz exe, sugeruj zip zamiast exe
+    (function(){
+      const dlExe = document.getElementById('dl-exe');
+      if(dlExe && dlExe.href && dlExe.href.endsWith('.exe')){
+        dlExe.title = 'Przeglądarki mogą blokować bezpośrednie .exe — rozważ zip.';
+      }
+    })();
+  </script>
+</body>
+</html>
